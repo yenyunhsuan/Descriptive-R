@@ -1,0 +1,20 @@
+---
+usethis :: use_github()---
+title: "Author"
+---
+
+## Contact
+
+**Name:** Tina Yen (Yun Hsuan)\
+\
+**email:** yhyen.2022\@mitb.smu.edu.sg\
+
+**LinkedIn:** <https://www.linkedin.com/in/tina-yen>
+
+## About me
+
+My most recent work experience as a **Marketing Analyst** involved managing multiple product development projects and conducting quantitative market research to optimize promotion strategies. By building production tracking dashboards and monitoring quarterly sales performance and inventory amounts, I successfully reduced slow-moving inventory by 50%.\
+\
+Pursuing a **Master's degree in data analytics at SMU**, I am passionate about leveraging data to drive business decisions. My experience in data analytics projects has equipped me with the necessary skills to analyze and interpret complex data sets, build predictive models, and develop interactive visualization app.\
+\
+I have developed skills in programming languages such as **Python, JMP Pro and R**. In addition, my leadership experience as a Project Manager and President of university club has honed my skills in team management and communication.

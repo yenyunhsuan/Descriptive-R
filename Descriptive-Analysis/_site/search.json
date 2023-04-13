@@ -1,0 +1,93 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Author",
+    "section": "",
+    "text": "Name: Tina Yen (Yun Hsuan)\n\nemail: yhyen.2022@mitb.smu.edu.sg\n\nLinkedIn: https://www.linkedin.com/in/tina-yen"
+  },
+  {
+    "objectID": "about.html#about-me",
+    "href": "about.html#about-me",
+    "title": "Author",
+    "section": "About me",
+    "text": "About me\nMy most recent work experience as a Marketing Analyst involved managing multiple product development projects and conducting quantitative market research to optimize promotion strategies. By building production tracking dashboards and monitoring quarterly sales performance and inventory amounts, I successfully reduced slow-moving inventory by 50%.\n\nPursuing a Master’s degree in data analytics at SMU, I am passionate about leveraging data to drive business decisions. My experience in data analytics projects has equipped me with the necessary skills to analyze and interpret complex data sets, build predictive models, and develop interactive visualization app.\n\nI have developed skills in programming languages such as Python, JMP Pro and R. In addition, my leadership experience as a Project Manager and President of university club has honed my skills in team management and communication."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Electricity Consumption Prediction",
+    "section": "",
+    "text": "This project applied descriptive and statistic analysis in R to determine key variables to analyze Singapore household energy usage among different housing types, areas and periods."
+  },
+  {
+    "objectID": "index.html#electricity-consumption-by-room-type-2005-2022",
+    "href": "index.html#electricity-consumption-by-room-type-2005-2022",
+    "title": "Electricity Consumption Prediction",
+    "section": "Electricity Consumption by Room Type (2005-2022)",
+    "text": "Electricity Consumption by Room Type (2005-2022)\n\nmydata <- read_excel(\"damand data/DemandSideData.xlsx\",sheet='Housetype_consumption')\nmy_colors <- c(\"1-room / 2-room\" = \"tan\", \"3-room\" = \"green\", \"4-room\" = \"lightblue\", \"5-room and Executive\" = \"blue\",\"Private Apartments and Condominiums\" = \"coral\",\"Landed Properties\" = \"pink\")\nggplot(mydata, aes(x = Year , y = AverageAnnualHouseholdElectricityConsumption,color=Roomtype)) +\n  geom_point()+\n  labs( \n    y='Annual Average Consumption(kWh)',x='Year')+\n  geom_smooth(method=lm, se=F)+ scale_color_manual(values = my_colors)"
+  },
+  {
+    "objectID": "index.html#household-size-by-room-type-2005-2022",
+    "href": "index.html#household-size-by-room-type-2005-2022",
+    "title": "Electricity Consumption Prediction",
+    "section": "Household Size by Room Type (2005-2022)",
+    "text": "Household Size by Room Type (2005-2022)\n\nlibrary(readxl)\nDemandSideData <- read_excel(\"damand data/DemandSideData.xlsx\", \n                             sheet = \"Householdsize\")\ndata_long <- tidyr::gather(DemandSideData, key = \"Room_type\", value = 'Household_size', -Year)\nggplot(data_long, aes(x = Year, y = Household_size, color = Room_type)) +\n  labs(\n    x='Year')+\n  geom_line()"
+  },
+  {
+    "objectID": "index.html#number-of-household-by-room-type",
+    "href": "index.html#number-of-household-by-room-type",
+    "title": "Electricity Consumption Prediction",
+    "section": "Number of Household by Room Type",
+    "text": "Number of Household by Room Type\n\nHousehold_number <- read_excel(\"damand data/DemandSideData.xlsx\", \n                               sheet = \"Household_number\")\ndata <- tidyr::gather(Household_number, key = \"Room_type\", value = 'Household_number', -Year)\nggplot(data, aes(x = Year, y = Household_number/1000, color = Room_type)) +\n  geom_line()+\n  labs(y='Number of household(1/1000)',\n       x='Year')+\n  scale_y_continuous(labels = scales::comma)"
+  },
+  {
+    "objectID": "index.html#household-electricity-consumption-by-region-2005-2022",
+    "href": "index.html#household-electricity-consumption-by-region-2005-2022",
+    "title": "Electricity Consumption Prediction",
+    "section": "Household Electricity Consumption by Region (2005-2022)",
+    "text": "Household Electricity Consumption by Region (2005-2022)\n\nlibrary(tmap)\nlibrary(sf)\nlibrary(readxl)\nlibrary(leaflet)\n\n\n\nregion <- read_excel(\"damand data/Consumption_region.xlsx\", \n                     sheet = \"Consumption_region\")\n\nshapefile <- st_read(\"damand data/shapefile/MP14_SUBZONE_NO_SEA_PL.shp\") \n\nReading layer `MP14_SUBZONE_NO_SEA_PL' from data source \n  `C:\\Users\\Tina\\Documents\\SMU\\Term1\\R and Statistics\\yenyunhsuan\\Descriptive-Analysis\\damand data\\shapefile\\MP14_SUBZONE_NO_SEA_PL.shp' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\nregion_summary <- region %>%\n  group_by(Region) %>%\n  summarize(avg_annual_consumption = mean(Monthly_Consumption) * 12)\n\ndata_map_area <- inner_join(shapefile,region_summary, by= c(\"PLN_AREA_N\" = \"Region\"))\n\ntmap_options(check.and.fix = TRUE)\ntmap_mode(\"view\")\nqtm(data_map_area, fill=\"avg_annual_consumption\", fill.id = \"PLN_AREA_N\")"
+  },
+  {
+    "objectID": "index.html#annual-household-electricity-consumption-2005-2021",
+    "href": "index.html#annual-household-electricity-consumption-2005-2021",
+    "title": "Electricity Consumption Prediction",
+    "section": "Annual Household Electricity Consumption (2005-2021)",
+    "text": "Annual Household Electricity Consumption (2005-2021)\n\nlibrary(readxl)\nDemand_Data <- read_excel(\"damand data/DemandSideData.xlsx\", \n                          sheet = \"Consumption\")\nggplot(Demand_Data, aes(x = Year, y =Annual_Consumption)) +\n  labs(x='Year',y='Electricity Consumption')+\n  geom_smooth(method=lm, se=F)+\n  geom_point()+geom_line()+scale_x_continuous(breaks = seq(2005, 2022, 1))"
+  },
+  {
+    "objectID": "index.html#average-monthly-household-electricity-consumption-2005-2022",
+    "href": "index.html#average-monthly-household-electricity-consumption-2005-2022",
+    "title": "Electricity Consumption Prediction",
+    "section": "Average Monthly Household Electricity Consumption (2005-2022)",
+    "text": "Average Monthly Household Electricity Consumption (2005-2022)\n\nMonthly <- read_excel(\"damand data/Each month temperature, average consumption.xlsx\")\nMonthly$Month <- factor(Monthly$Month, levels = \n                          c(\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"))\nggplot(Monthly, aes(x = Month, y = `Average Monthly Household Electricity Consumption (kWh)`, fill = Month)) + geom_boxplot() +\n  scale_fill_discrete(name = \"Month\") +\n  labs(x = \"Month\", y = \"Average Monthly Household Electricity Consumption (kWh)\")"
+  },
+  {
+    "objectID": "index.html#average-monthly-temperature-2005-2022",
+    "href": "index.html#average-monthly-temperature-2005-2022",
+    "title": "Electricity Consumption Prediction",
+    "section": "Average Monthly Temperature (2005-2022)",
+    "text": "Average Monthly Temperature (2005-2022)\n\nMonthly <- read_excel(\"damand data/Each month temperature, average consumption.xlsx\")\nMonthly$Month <- factor(Monthly$Month, levels = c(\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"))\nggplot(Monthly, aes(x = Month)) +\n  geom_boxplot(aes(y = `Mean temperature`, fill = Month), alpha = 0.5) +\n  labs(x = \"Month\", y = \"Temperature\", fill = \"Month\") +\n  scale_fill_manual(values = \n                      c(\"#E69F00\", \"#56B4E9\", \"#009E73\", \"#F0E442\", \"#0072B2\", \"#D55E00\", \"#CC79A7\", \"#999999\", \"#000000\", \"#FFC0CB\", \"#8A2BE2\", \"#A52A2A\"))"
+  },
+  {
+    "objectID": "index.html#correlation-between-temperature-and-consumption",
+    "href": "index.html#correlation-between-temperature-and-consumption",
+    "title": "Electricity Consumption Prediction",
+    "section": "Correlation between Temperature and Consumption",
+    "text": "Correlation between Temperature and Consumption\n\nlibrary('ggside')\nlibrary(ggstatsplot)\nggscatterstats(\n  data = Monthly,\n  x = `Mean temperature`,\n  y = `Average Monthly Household Electricity Consumption (kWh)`,\n  xlab = 'Monthly Temperature',\n  bf.message = FALSE\n)"
+  },
+  {
+    "objectID": "index.html#monthly-electricity-consumption-by-house-type",
+    "href": "index.html#monthly-electricity-consumption-by-house-type",
+    "title": "Electricity Consumption Prediction",
+    "section": "Monthly Electricity Consumption by House Type",
+    "text": "Monthly Electricity Consumption by House Type\n\nlibrary(readxl)\nHousingType <- read_excel(\"damand data/MonthlyConsumptionByHousingType.xlsx\")\nggplot(HousingType, aes(x = factor(Month, levels = 1:12), y = AverageMonthlyHouseholdElectricityConsumption, fill = factor(Room_type))) +\n  geom_boxplot() +\n  scale_fill_manual(values = c(\"#FFC0CB\", \"#00BFFF\", \"#7FFF00\", \"#FF8C00\", \"#FFD700\", \"#BA55D3\")) +\n  facet_wrap(~ Housing_Type, scales = \"free_y\") +\n  labs(x = \"Month\", y = \"Average Monthly Household Electricity Consumption\") +\n  theme_bw() +\n  theme(plot.title = element_text(hjust = 0.5))"
+  },
+  {
+    "objectID": "index.html#pre-during-after-covid-household-electricity-consumption-20198-20227",
+    "href": "index.html#pre-during-after-covid-household-electricity-consumption-20198-20227",
+    "title": "Electricity Consumption Prediction",
+    "section": "Pre, During, After Covid Household Electricity Consumption (2019/8-2022/7)",
+    "text": "Pre, During, After Covid Household Electricity Consumption (2019/8-2022/7)\n\nggplot(data = mydata_filtered, aes(x = Year_Month, y = Monthly_Consumption)) +\n  geom_area(fill = \"blue\") +\n  xlab(\"Time\") +\n  ylab(\"Monthly Consumption\") +\n  scale_x_date(date_breaks = \"1 month\", date_labels = \"%Y/%m\",\n               limits = c(ymd(\"2019-08-01\"), ymd(\"2022-06-01\")),\n               expand = c(0, 0)) +\n  theme(axis.text.x = element_text(angle = 90, hjust = 1),\n        plot.margin = unit(c(2,1,2,1), \"cm\"))"
+  }
+]

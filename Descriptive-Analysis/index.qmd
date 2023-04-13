@@ -1,0 +1,187 @@
+---
+title: "Electricity Consumption Prediction"
+---
+
+This project applied descriptive and statistic analysis in R to determine key variables to analyze Singapore household energy usage among different housing types, areas and periods.
+
+```{r,warning=FALSE,message=FALSE,include=FALSE}
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+library(shiny)
+library(rsconnect)
+```
+
+## Electricity Consumption by Room Type (2005-2022)
+
+```{r,warning=FALSE,message=FALSE}
+mydata <- read_excel("damand data/DemandSideData.xlsx",sheet='Housetype_consumption')
+my_colors <- c("1-room / 2-room" = "tan", "3-room" = "green", "4-room" = "lightblue", "5-room and Executive" = "blue","Private Apartments and Condominiums" = "coral","Landed Properties" = "pink")
+ggplot(mydata, aes(x = Year , y = AverageAnnualHouseholdElectricityConsumption,color=Roomtype)) +
+  geom_point()+
+  labs( 
+    y='Annual Average Consumption(kWh)',x='Year')+
+  geom_smooth(method=lm, se=F)+ scale_color_manual(values = my_colors)
+```
+
+## Household Size by Room Type (2005-2022)
+
+```{r,warning=FALSE,message=FALSE}
+library(readxl)
+DemandSideData <- read_excel("damand data/DemandSideData.xlsx", 
+                             sheet = "Householdsize")
+data_long <- tidyr::gather(DemandSideData, key = "Room_type", value = 'Household_size', -Year)
+ggplot(data_long, aes(x = Year, y = Household_size, color = Room_type)) +
+  labs(
+    x='Year')+
+  geom_line()
+```
+
+## Number of Household by Room Type
+
+```{r,warning=FALSE,message=FALSE}
+Household_number <- read_excel("damand data/DemandSideData.xlsx", 
+                               sheet = "Household_number")
+data <- tidyr::gather(Household_number, key = "Room_type", value = 'Household_number', -Year)
+ggplot(data, aes(x = Year, y = Household_number/1000, color = Room_type)) +
+  geom_line()+
+  labs(y='Number of household(1/1000)',
+       x='Year')+
+  scale_y_continuous(labels = scales::comma)
+```
+
+## Household Electricity Consumption by Region (2005-2022)
+
+```{r,warning=FALSE,message=FALSE}
+
+library(tmap)
+library(sf)
+library(readxl)
+library(leaflet)
+
+
+
+region <- read_excel("damand data/Consumption_region.xlsx", 
+                     sheet = "Consumption_region")
+
+shapefile <- st_read("damand data/shapefile/MP14_SUBZONE_NO_SEA_PL.shp") 
+
+region_summary <- region %>%
+  group_by(Region) %>%
+  summarize(avg_annual_consumption = mean(Monthly_Consumption) * 12)
+
+data_map_area <- inner_join(shapefile,region_summary, by= c("PLN_AREA_N" = "Region"))
+
+tmap_options(check.and.fix = TRUE)
+tmap_mode("view")
+qtm(data_map_area, fill="avg_annual_consumption", fill.id = "PLN_AREA_N")
+```
+
+## Annual Household Electricity Consumption (2005-2021)
+
+```{r,warning=FALSE,message=FALSE}
+library(readxl)
+Demand_Data <- read_excel("damand data/DemandSideData.xlsx", 
+                          sheet = "Consumption")
+ggplot(Demand_Data, aes(x = Year, y =Annual_Consumption)) +
+  labs(x='Year',y='Electricity Consumption')+
+  geom_smooth(method=lm, se=F)+
+  geom_point()+geom_line()+scale_x_continuous(breaks = seq(2005, 2022, 1))
+```
+
+## Average Monthly Household Electricity Consumption (2005-2022)
+
+```{r,warning=FALSE,message=FALSE}
+Monthly <- read_excel("damand data/Each month temperature, average consumption.xlsx")
+Monthly$Month <- factor(Monthly$Month, levels = 
+                          c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+ggplot(Monthly, aes(x = Month, y = `Average Monthly Household Electricity Consumption (kWh)`, fill = Month)) + geom_boxplot() +
+  scale_fill_discrete(name = "Month") +
+  labs(x = "Month", y = "Average Monthly Household Electricity Consumption (kWh)")
+```
+
+## Average Monthly Temperature (2005-2022)
+
+```{r,warning=FALSE,message=FALSE}
+Monthly <- read_excel("damand data/Each month temperature, average consumption.xlsx")
+Monthly$Month <- factor(Monthly$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+ggplot(Monthly, aes(x = Month)) +
+  geom_boxplot(aes(y = `Mean temperature`, fill = Month), alpha = 0.5) +
+  labs(x = "Month", y = "Temperature", fill = "Month") +
+  scale_fill_manual(values = 
+                      c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999", "#000000", "#FFC0CB", "#8A2BE2", "#A52A2A"))
+```
+
+```{r,warning=FALSE,message=FALSE,include=FALSE}
+library(readxl)
+Monthly <- read_excel("damand data/Each month temperature, average consumption.xlsx")
+cor(Monthly$`Mean temperature`, 
+    Monthly$`Average Monthly Household Electricity Consumption (kWh)`)
+
+test <- cor.test(Monthly$`Mean temperature`, 
+Monthly$`Average Monthly Household Electricity Consumption (kWh)`)
+test
+
+
+library(ggplot2)
+ggplot(Monthly) +
+  aes(x = `Mean temperature`, y = `Average Monthly Household Electricity Consumption (kWh)`) +
+  geom_point(colour = "#0c4c8a")+
+  xlab("Average Monthly Temperature")
+  theme_minimal()
+```
+
+## Correlation between Temperature and Consumption
+
+```{r,warning=FALSE,message=FALSE}
+library('ggside')
+library(ggstatsplot)
+ggscatterstats(
+  data = Monthly,
+  x = `Mean temperature`,
+  y = `Average Monthly Household Electricity Consumption (kWh)`,
+  xlab = 'Monthly Temperature',
+  bf.message = FALSE
+)
+```
+
+## Monthly Electricity Consumption by House Type
+
+```{r,warning=FALSE,message=FALSE}
+library(readxl)
+HousingType <- read_excel("damand data/MonthlyConsumptionByHousingType.xlsx")
+ggplot(HousingType, aes(x = factor(Month, levels = 1:12), y = AverageMonthlyHouseholdElectricityConsumption, fill = factor(Room_type))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("#FFC0CB", "#00BFFF", "#7FFF00", "#FF8C00", "#FFD700", "#BA55D3")) +
+  facet_wrap(~ Housing_Type, scales = "free_y") +
+  labs(x = "Month", y = "Average Monthly Household Electricity Consumption") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r,warning=FALSE,message=FALSE,include=FALSE}
+library(dplyr)
+library(readxl)
+library(lubridate)
+library(ggplot2)
+mydata <- read_excel("damand data/Demand_Data_Monthly_compiled.xlsx", sheet = "Demand_Data_Monthly_compiled")
+mydata_filtered <- mydata %>%
+  filter(Area == "Whole Country") %>%
+  mutate(Year_Month = ymd(paste0(Year, "-", Month, "-01"))) %>%
+  filter(Year_Month >= ymd("2019-08-01") & Year_Month <= ymd("2022-06-01"))
+```
+
+## Pre, During, After Covid Household Electricity Consumption (2019/8-2022/7)
+
+```{r,warning=FALSE,message=FALSE}
+ggplot(data = mydata_filtered, aes(x = Year_Month, y = Monthly_Consumption)) +
+  geom_area(fill = "blue") +
+  xlab("Time") +
+  ylab("Monthly Consumption") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%Y/%m",
+               limits = c(ymd("2019-08-01"), ymd("2022-06-01")),
+               expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        plot.margin = unit(c(2,1,2,1), "cm"))
+
+```
